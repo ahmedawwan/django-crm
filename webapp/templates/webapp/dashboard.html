@@ -35,7 +35,7 @@
       <td>{{record.city}}</td>
       <td>{{record.province}}</td>
       <td>{{record.country}}</td>
-      <td>View</td>
+      <td><a href = "{% url 'view-record' pk=record.id %}">View</a></td>
     </tr>
     {% endfor %}
   </tbody>

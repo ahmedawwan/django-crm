@@ -101,3 +101,40 @@ def create_record(request):
             return redirect('dashboard')
     context = {'form': form}
     return render(request, 'webapp/create-record.html', context=context)
+
+
+@login_required(login_url="login")
+def update_record(request, pk):
+    """ 
+    Update a Record
+    """
+    record = Record.objects.get(id=pk)
+    form = UpdateRecordForm(instance=record)
+
+    if request.method == "POST":
+        form = UpdateRecordForm(request.POST, instance=record)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+    context = {'form': form}
+    return render(request, 'webapp/update-record.html', context=context)
+
+
+@login_required(login_url="login")
+def view_record(request, pk):
+    """ 
+    View a Record
+    """
+    record = Record.objects.get(id=pk)
+    context = {'record': record}
+    return render(request, 'webapp/view-record.html', context=context)
+
+
+@login_required(login_url="login")
+def delete_record(request, pk):
+    """ 
+    Delete a Record
+    """
+    record = Record.objects.get(id=pk)
+    record.delete()
+    return redirect("dashboard")
