@@ -1,15 +1,28 @@
-from django.shortcuts import render, redirect
-from .forms import CreateUserForm, LoginForm
+""" 
+My Views
+"""
 from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .forms import CreateUserForm, LoginForm
 
-# Home View
+
 def home(request):
-    # return HttpResponse("Hello World!")
+    """ 
+    My Home View
+    """
+    if request.user.is_authenticated:
+        return redirect('dashboard')
     return render(request, 'webapp/index.html')
 
-# Register View
 def register(request):
+    """ 
+    My Register View
+    """
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
     form = CreateUserForm()
 
     if request.method == "POST":
@@ -23,8 +36,13 @@ def register(request):
 
     return render(request, 'webapp/register.html', context)
 
-# Login View
 def login(request):
+    """ 
+    My Login View
+    """
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
     form = LoginForm()
 
     if request.method == "POST":
@@ -38,13 +56,24 @@ def login(request):
 
             if user is not None:
                 auth.login(request, user)
-                return redirect('')
-    
+                return redirect('dashboard')
+
     context = {"form": form}
     return render(request, 'webapp/login.html', context)
 
-# Logout View
 def logout(request):
+    """ 
+    My Logout View
+    """
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
     auth.logout(request)
     return redirect("login")
 
+@login_required(login_url="login")
+def dashboard(request):
+    """ 
+    My Dashboard View
+    """
+    return render(request, 'webapp/dashboard.html')
