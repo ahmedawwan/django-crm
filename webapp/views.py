@@ -5,7 +5,8 @@ from django.contrib.auth.models import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from .forms import CreateUserForm, LoginForm
+from .forms import CreateUserForm, LoginForm, CreateRecordForm, UpdateRecordForm
+from .models import Record
 
 
 def home(request):
@@ -15,6 +16,7 @@ def home(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
     return render(request, 'webapp/index.html')
+
 
 def register(request):
     """ 
@@ -36,6 +38,7 @@ def register(request):
 
     return render(request, 'webapp/register.html', context)
 
+
 def login(request):
     """ 
     My Login View
@@ -46,7 +49,7 @@ def login(request):
     form = LoginForm()
 
     if request.method == "POST":
-        form = LoginForm(request, data = request.POST)
+        form = LoginForm(request, data=request.POST)
 
         if form.is_valid():
             username = request.POST.get("username")
@@ -61,6 +64,7 @@ def login(request):
     context = {"form": form}
     return render(request, 'webapp/login.html', context)
 
+
 def logout(request):
     """ 
     My Logout View
@@ -71,9 +75,29 @@ def logout(request):
     auth.logout(request)
     return redirect("login")
 
+
 @login_required(login_url="login")
 def dashboard(request):
     """ 
     My Dashboard View
     """
-    return render(request, 'webapp/dashboard.html')
+    my_records = Record.objects.all()
+    context = {'records': my_records}
+
+    return render(request, 'webapp/dashboard.html', context=context)
+
+
+@login_required(login_url="login")
+def create_record(request):
+    """ 
+    Create a Record
+    """
+    form = CreateRecordForm()
+
+    if request.method == "POST":
+        form = CreateRecordForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('dashboard')
+    context = {'form': form}
+    return render(request, 'webapp/create-record.html', context=context)
