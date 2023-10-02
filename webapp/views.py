@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .forms import CreateUserForm, LoginForm, CreateRecordForm, UpdateRecordForm
 from .models import Record
+from django.contrib import messages
 
 
 def home(request):
@@ -32,6 +33,8 @@ def register(request):
 
         if form.is_valid():
             form.save()
+            messages.success(
+                request, "Account Created Successfully, Please login")
             return redirect('login')
 
     context = {'form': form}
@@ -71,7 +74,7 @@ def logout(request):
     """
     if request.user.is_authenticated:
         return redirect('dashboard')
-
+    messages.success(request, "You've been logged out")
     auth.logout(request)
     return redirect("login")
 
@@ -98,6 +101,7 @@ def create_record(request):
         form = CreateRecordForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Your record was created")
             return redirect('dashboard')
     context = {'form': form}
     return render(request, 'webapp/create-record.html', context=context)
@@ -115,6 +119,7 @@ def update_record(request, pk):
         form = UpdateRecordForm(request.POST, instance=record)
         if form.is_valid():
             form.save()
+            messages.success(request, "Your record was updated")
             return redirect('dashboard')
     context = {'form': form}
     return render(request, 'webapp/update-record.html', context=context)
@@ -137,4 +142,5 @@ def delete_record(request, pk):
     """
     record = Record.objects.get(id=pk)
     record.delete()
+    messages.success(request, "Your record was deleted")
     return redirect("dashboard")
